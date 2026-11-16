@@ -12,7 +12,9 @@ function showPage(requested='index.html',push=false){
   const doc=new DOMParser().parseFromString(html,'text/html');
   doc.querySelectorAll('link[rel="canonical"],meta[property^="og:"],meta[name="twitter:card"]').forEach(el=>el.remove());
   for(const el of doc.querySelectorAll('[href],[src],[data]'))for(const attr of ['href','src','data']){
-    const value=el.getAttribute(attr);if(!value||value.startsWith('#')||/^(https?:|mailto:|data:|blob:)/.test(value))continue;
+    const value=el.getAttribute(attr);if(!value)continue;
+    if(attr==='href'&&value.startsWith('#')){el.setAttribute('data-private-path',path+value);el.setAttribute('href','#');continue;}
+    if(/^(https?:|mailto:|data:|blob:)/.test(value))continue;
     const resolved=new URL(value,'https://portfolio.invalid/'+path),name=resolved.pathname.slice(1);
     if(!entries[name])continue;
     if(attr==='href'&&name.endsWith('.html')){el.setAttribute('data-private-path',name+resolved.hash);el.setAttribute('href','#');}
